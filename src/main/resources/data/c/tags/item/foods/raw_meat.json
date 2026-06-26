@@ -1,7 +1,5 @@
 {
-  "replace": false,
   "values": [
-    "minecraft:beef",
     "immortalers_delight:raw_sniffer_steak",
     "immortalers_delight:raw_sniffer_slice"
   ]
