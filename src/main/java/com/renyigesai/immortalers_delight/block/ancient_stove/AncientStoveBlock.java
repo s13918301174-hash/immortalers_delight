@@ -1,87 +1,135 @@
 package com.renyigesai.immortalers_delight.block.ancient_stove;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightBlocks;
+import com.renyigesai.immortalers_delight.util.BlockItemInteraction;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.crafting.CampfireCookingRecipe;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.BooleanOp;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.common.ItemAbilities;
 import vectorwing.farmersdelight.common.block.AbstractStoveBlock;
+import vectorwing.farmersdelight.common.registry.ModDamageTypes;
+import vectorwing.farmersdelight.common.registry.ModSounds;
+import vectorwing.farmersdelight.common.utility.ItemUtils;
+import vectorwing.farmersdelight.common.utility.MathUtils;
 
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class AncientStoveBlock extends AbstractStoveBlock implements WeatheringCopper {
 
     private final WeatheringCopper.WeatherState weatherState;
     private final boolean waxed;
-    private static final VoxelShape GRILLING_AREA;
+
+    private static final Codec<WeatheringCopper.WeatherState> WEATHER_STATE_CODEC = StringRepresentable.fromEnum(WeatheringCopper.WeatherState::values);
+
+    public static final MapCodec<AncientStoveBlock> DIRECT_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            BlockBehaviour.propertiesCodec(),
+            WEATHER_STATE_CODEC.fieldOf("weather_state").forGetter(AncientStoveBlock::getAge),
+            Codec.BOOL.fieldOf("waxed").forGetter(b -> b.waxed)
+    ).apply(instance, AncientStoveBlock::new));
 
     Supplier<BiMap<Block, Block>> NEXT_BY_BLOCK = Suppliers.memoize(() -> ImmutableBiMap.<Block, Block>builder().put(ImmortalersDelightBlocks.ANCIENT_STOVE.get(),ImmortalersDelightBlocks.EXPOSED_ANCIENT_STOVE.get()).put(ImmortalersDelightBlocks.EXPOSED_ANCIENT_STOVE.get(),ImmortalersDelightBlocks.WEATHERED_ANCIENT_STOVE.get()).put(ImmortalersDelightBlocks.WEATHERED_ANCIENT_STOVE.get(),ImmortalersDelightBlocks.OXIDIZED_ANCIENT_STOVE.get()).build());
     Supplier<BiMap<Block, Block>> WAXED_BY_BLOCK = Suppliers.memoize(() -> ImmutableBiMap.<Block, Block>builder().put(ImmortalersDelightBlocks.ANCIENT_STOVE.get(),ImmortalersDelightBlocks.WAXED_ANCIENT_STOVE.get()).put(ImmortalersDelightBlocks.EXPOSED_ANCIENT_STOVE.get(),ImmortalersDelightBlocks.WAXED_EXPOSED_ANCIENT_STOVE.get()).put(ImmortalersDelightBlocks.WEATHERED_ANCIENT_STOVE.get(),ImmortalersDelightBlocks.WAXED_WEATHERED_ANCIENT_STOVE.get()).put(ImmortalersDelightBlocks.OXIDIZED_ANCIENT_STOVE.get(),ImmortalersDelightBlocks.WAXED_OXIDIZED_ANCIENT_STOVE.get()).build());
 
-    public AncientStoveBlock(Properties properties, WeatherState weatherState, boolean waxed) {
+    public AncientStoveBlock(BlockBehaviour.Properties properties, WeatherState weatherState, boolean waxed) {
         super(properties);
         this.weatherState = weatherState;
         this.waxed = waxed;
     }
 
+    private static EquipmentSlot slotForHand(InteractionHand hand) {
+        return hand == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND;
+    }
+
+
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        ItemStack heldStack = player.getItemInHand(hand);
+    protected MapCodec<? extends AncientStoveBlock> codec() {
+        return DIRECT_CODEC;
+    }
+
+    @Override
+    public ItemInteractionResult useItemOn(ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+
         Item heldItem = heldStack.getItem();
         boolean instabuild = player.getAbilities().instabuild;
 
         if (!this.waxed && heldStack.is(Items.HONEYCOMB) && waxed(level,player,heldStack,state,pos,instabuild)){
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
 
         if (heldItem instanceof AxeItem){
             if (this.waxed && waxedOff(level,player,heldStack,hand,state,pos,instabuild)){
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
             Block scrape = getScrape(state.getBlock());
             if (scrape != null){
                 BlockState newState = scrape.defaultBlockState().setValue(LIT,state.getValue(LIT)).setValue(FACING,state.getValue(FACING));
                 level.setBlockAndUpdate(pos,newState);
                 if (!instabuild) {
-                    heldStack.hurtAndBreak(1, player, (p_150686_) -> {
-                        p_150686_.broadcastBreakEvent(hand);
-                    });
+                    heldStack.hurtAndBreak(1,player,slotForHand(hand));
                 }
                 level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.levelEvent(3005,pos,0);
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (weatherState == WeatheringCopper.WeatherState.OXIDIZED){
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        return super.use(state, level, pos, player, hand, hit);
+
+        return super.useItemOn(heldStack, state, level, pos, player, hand, hit);
     }
 
     private boolean waxed(Level level, Player player, ItemStack heldStack, BlockState state, BlockPos pos, boolean instabuild){
@@ -108,9 +156,7 @@ public class AncientStoveBlock extends AbstractStoveBlock implements WeatheringC
             BlockState newState = block.defaultBlockState().setValue(LIT,state.getValue(LIT)).setValue(FACING,state.getValue(FACING));
             level.setBlockAndUpdate(pos,newState);
             if (!instabuild) {
-                heldStack.hurtAndBreak(1, player, (p_150686_) -> {
-                    p_150686_.broadcastBreakEvent(hand);
-                });
+                heldStack.hurtAndBreak(1, player, slotForHand(hand));
             }
             level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(player, 3004, pos, 0);
@@ -174,6 +220,17 @@ public class AncientStoveBlock extends AbstractStoveBlock implements WeatheringC
         }
     }
 
+    @javax.annotation.Nullable
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return ((BlockEntityType)ImmortalersDelightBlocks.ANCIENT_STOVE_ENTITY.get()).create(pos,state);
+    }
+
+    @javax.annotation.Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return state.getValue(LIT) ? createTickerHelper(blockEntityType, ImmortalersDelightBlocks.ANCIENT_STOVE_ENTITY.get(), level.isClientSide ? AncientStoveBlockEntity::particleTick : AncientStoveBlockEntity::serverTick) : null;
+    }
+
+
     public boolean isRandomlyTicking(BlockState pState) {
         return getNext(pState.getBlock()).isPresent()/* && !pState.getValue(LIT)*/;
     }
@@ -199,30 +256,5 @@ public class AncientStoveBlock extends AbstractStoveBlock implements WeatheringC
             }
         }
         return null;
-    }
-
-    public static boolean isStoveTopCovered(Level level, BlockPos pos, BlockState stoveState) {
-        if (!(stoveState.getBlock() instanceof AncientStoveBlock)) {
-            return false;
-        } else {
-            BlockPos abovePos = pos.above();
-            BlockState aboveState = level.getBlockState(abovePos);
-            return Shapes.joinIsNotEmpty(GRILLING_AREA, aboveState.getShape(level, abovePos), BooleanOp.AND);
-        }
-    }
-
-    @javax.annotation.Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide && (Boolean)state.getValue(LIT) ? createTickerHelper(blockEntityType, ImmortalersDelightBlocks.ANCIENT_STOVE_ENTITY.get(), AncientStoveBlockEntity::particleTick) : createStoveTicker(level, blockEntityType, ImmortalersDelightBlocks.ANCIENT_STOVE_ENTITY.get());
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new AncientStoveBlockEntity(blockPos,blockState);
-    }
-
-    static {
-        GRILLING_AREA = Block.box(3.0, 0.0, 3.0, 13.0, 1.0, 13.0);
     }
 }

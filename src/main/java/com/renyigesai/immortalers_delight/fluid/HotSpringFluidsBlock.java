@@ -3,6 +3,7 @@ package com.renyigesai.immortalers_delight.fluid;
 import com.google.common.collect.ImmutableMap;
 import com.renyigesai.immortalers_delight.ImmortalersDelightMod;
 import com.renyigesai.immortalers_delight.recipe.HotSpringRecipe;
+import com.renyigesai.immortalers_delight.recipe.SimpleContainerRecipeInput;
 import com.renyigesai.immortalers_delight.util.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,13 +14,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,11 +31,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.ObjectUtils;
 import vectorwing.farmersdelight.common.registry.ModParticleTypes;
-import vectorwing.farmersdelight.common.tag.ModTags;
+import com.renyigesai.immortalers_delight.init.ImmortalersDelightTags;
 
 import java.util.*;
 
@@ -42,7 +44,7 @@ import java.util.*;
 public class HotSpringFluidsBlock extends LiquidBlock {
 
     public HotSpringFluidsBlock() {
-        super(ImmortalersDelightFluids.HOT_SPRING,
+        super(ImmortalersDelightFluids.FLOWING_HOT_SPRING.get(),
                 Properties.of().mapColor(MapColor.WATER).strength(100f)
                         .noCollission().noLootTable().liquid().pushReaction(PushReaction.DESTROY).sound(SoundType.EMPTY).replaceable().randomTicks());
     }
@@ -63,7 +65,8 @@ public class HotSpringFluidsBlock extends LiquidBlock {
         }
 
         return level.getRecipeManager()
-                .getRecipeFor(HotSpringRecipe.Type.INSTANCE, inventory, level);
+                .getRecipeFor(HotSpringRecipe.Type.INSTANCE, new SimpleContainerRecipeInput(inventory), level)
+                .map(RecipeHolder::value);
     }
 
     @Override
@@ -90,11 +93,11 @@ public class HotSpringFluidsBlock extends LiquidBlock {
     //温泉热源逻辑，在下界以外同厨锅，补充了温泉在下界沸腾的设定，在下界则是单独的温泉方块即可(避免出现大片温泉高频查配方导致卡顿)
     public boolean isHeatSources(Level level, BlockPos pos){
         BlockState stateBelow = level.getBlockState(pos.below());
-        if (stateBelow.is(ModTags.Blocks.HEAT_SOURCES)) {
+        if (stateBelow.is(ImmortalersDelightTags.FARMERSDELIGHT_HEAT_SOURCES)) {
             return stateBelow.hasProperty(BlockStateProperties.LIT) ? stateBelow.getValue(BlockStateProperties.LIT) : !stateBelow.getFluidState().is(ImmortalersDelightFluids.HOT_SPRING.get());
-        } else if (stateBelow.is(ModTags.Blocks.HEAT_CONDUCTORS)) {
+        } else if (stateBelow.is(ImmortalersDelightTags.FARMERSDELIGHT_HEAT_CONDUCTORS)) {
             BlockState stateFurtherBelow = level.getBlockState(pos.below(2));
-            if (stateFurtherBelow.is(ModTags.Blocks.HEAT_SOURCES)) {
+            if (stateFurtherBelow.is(ImmortalersDelightTags.FARMERSDELIGHT_HEAT_SOURCES)) {
                 if (stateFurtherBelow.hasProperty(BlockStateProperties.LIT)) {
                     return (Boolean)stateFurtherBelow.getValue(BlockStateProperties.LIT);
                 }
@@ -118,18 +121,20 @@ public class HotSpringFluidsBlock extends LiquidBlock {
     }
 
     private void craftTick(Level level, BlockPos pos){
-        List<ItemEntity> itemEntityList = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos,pos).inflate(1,1,1));
+        List<ItemEntity> itemEntityList = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(1.0, 1.0, 1.0));
         if (itemEntityList.isEmpty())
             return;
         List<ItemStack> stackList = new ArrayList<>();
         for (ItemEntity entity : itemEntityList) {
             ItemStack item = entity.getItem();
-            if (!item.isEmpty() && item.getCount() == 1) {
+            if (!item.isEmpty()) {
                 stackList.add(item);
             }
         }
         if (stackList.isEmpty())
             return;
+
+        int resultCount = getResultCount(stackList);
         Optional<HotSpringRecipe> recipeOptional = getCurrentRecipe(level,stackList);
         if (recipeOptional.isEmpty()){
             return;
@@ -137,9 +142,14 @@ public class HotSpringFluidsBlock extends LiquidBlock {
         HotSpringRecipe recipe = recipeOptional.get();
         ItemStack resultItem = recipe.getResultItem(level.registryAccess()).copy();
         for (ItemEntity itemEntity : itemEntityList) {
-            itemEntity.remove(Entity.RemovalReason.DISCARDED);
+            int count = itemEntity.getItem().getCount();
+            if (count > resultCount){
+                itemEntity.getItem().shrink(resultCount);
+            }else {
+                itemEntity.remove(Entity.RemovalReason.DISCARDED);
+            }
         }
-        ItemUtils.spawnItemEntity(level,resultItem,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,0,0,0);
+        ItemUtils.splitIntoStacks(resultItem, resultCount).forEach(item -> ItemUtils.spawnItemEntity(level, item, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0));
         if (level instanceof ServerLevel serverLevel){
             for (int i = 0; i < 4; i++) {
                 Vec3 vec3 = new Vec3((double)((level.random.nextFloat() * 2.0F - 1.0F) * 0.4F), level.random.nextInt(4) * 0.25D - 0.25D, (double)((level.random.nextFloat() * 2.0F - 1.0F) * 0.4F));
@@ -168,14 +178,32 @@ public class HotSpringFluidsBlock extends LiquidBlock {
         }
         if (pEntity instanceof LivingEntity living) {
             //沸腾状态下的温泉如灵魂火造成伤害，但对亡灵生物造成治疗效果
-            if (!living.getMobType().equals(MobType.UNDEAD) && !living.fireImmune()) {
+            if (!living.getType().is(EntityTypeTags.UNDEAD) && !living.fireImmune()) {
 //                living.setRemainingFireTicks(pEntity.getRemainingFireTicks() + 1);
 //                if (living.getRemainingFireTicks() == 0) {pEntity.setSecondsOnFire(8);}
                 living.hurt(pLevel.damageSources().inFire(), 2.0f);
             }
-            if (living.getMobType().equals(MobType.UNDEAD) && living.tickCount % 25 == 0) living.heal(1.0f);
+            if (living.getType().is(EntityTypeTags.UNDEAD) && living.tickCount % 25 == 0) living.heal(1.0f);
         } else if (pEntity instanceof ItemEntity){
             pLevel.scheduleTick(pPos,this,5);
         }
+    }
+
+    private static int getResultCount(List<ItemStack> stackList) {
+        int maxCount = 1;
+        for (ItemStack stack : stackList) {
+            int itemCount = stack.getMaxStackSize();
+            if (itemCount > maxCount){
+                maxCount = itemCount;
+            }
+        }
+        int resultCount = maxCount;
+        for (ItemStack stack : stackList) {
+            int itemCount = stack.getCount();
+            if (itemCount < resultCount) {
+                resultCount = itemCount;
+            }
+        }
+        return Math.max(resultCount, 1);
     }
 }

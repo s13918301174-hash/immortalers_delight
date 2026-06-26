@@ -1,5 +1,6 @@
 package com.renyigesai.immortalers_delight.block.crops;
 
+import com.mojang.serialization.MapCodec;
 import com.renyigesai.immortalers_delight.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -7,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -23,20 +25,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.IPlantable;
-import vectorwing.farmersdelight.common.registry.ModSounds;
-
+import net.neoforged.neoforge.common.CommonHooks;
 import java.util.List;
 
-public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWaterloggedBlock,BonemealableBlock {
+/** Rooted segment: survive on dirt/sand/gravel only if this block space is water ({@link #WATERLOGGED} or water fluid); stacked segments always survive. */
+public class LeisambooStalkBlock extends Block implements SimpleWaterloggedBlock, BonemealableBlock {
+    public static final MapCodec<LeisambooStalkBlock> CODEC = simpleCodec(LeisambooStalkBlock::new);
     public static final BooleanProperty IS_LEAVES = BooleanProperty.create("is_leaves");
     public static final BooleanProperty IS_TEA = BooleanProperty.create("is_tea");
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -48,6 +48,11 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
     public LeisambooStalkBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(this.stateDefinition.any().setValue(IS_LEAVES,true).setValue(IS_TEA,false).setValue(WATERLOGGED,false));
+    }
+
+    @Override
+    protected MapCodec<? extends Block> codec() {
+        return CODEC;
     }
 
     @Override
@@ -63,8 +68,7 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
         }
     }
 
-    @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    private InteractionResult stalkUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (canReap(state, level, pos, player, hand, hitResult)) {
             if (level.isClientSide){
                 return InteractionResult.SUCCESS;
@@ -89,7 +93,22 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
         if (itemInHand.is(Items.BONE_MEAL)){
             return InteractionResult.PASS;
         }
-        return super.use(state, level, pos, player, hand, hitResult);
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        InteractionResult result = stalkUse(state, level, pos, player, hand, hitResult);
+        if (result != InteractionResult.PASS) {
+            return com.renyigesai.immortalers_delight.util.BlockItemInteraction.from(level, result);
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        InteractionResult result = stalkUse(state, level, pos, player, InteractionHand.MAIN_HAND, hitResult);
+        return result != InteractionResult.PASS ? result : super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     public boolean canReap(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
@@ -102,16 +121,8 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
             int i;
             for(i = 1; level.getBlockState(pos.below(i)).is(this); ++i) {
             }
-            if (ForgeHooks.onCropsGrowPre(level, pos, state, randomSource.nextInt(3) == 0)) {
+            if (CommonHooks.canCropGrow(level, pos, state, randomSource.nextInt(3) == 0)) {
                 /*最大高度小于3时尝试向上生长一次*/
-//                if (i < 2){
-//                    level.setBlockAndUpdate(pos.above(), this.defaultBlockState().setValue(IS_LEAVES,true));
-//                    level.setBlock(pos,state.setValue(IS_LEAVES,false),3);
-//                    ForgeHooks.onCropsGrowPost(level, pos.above(), this.defaultBlockState());
-//                }
-//                if (i == 2){
-//                    level.setBlock(pos,state.setValue(IS_TEA,true),3);
-//                }
                 growBamboo(state,level,pos,i);
             }
         }
@@ -121,7 +132,7 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
         if (i < 2){
             level.setBlockAndUpdate(pos.above(), this.defaultBlockState().setValue(IS_LEAVES,true));
             level.setBlock(pos,state.setValue(IS_LEAVES,false),3);
-            ForgeHooks.onCropsGrowPost(level, pos.above(), this.defaultBlockState());
+            CommonHooks.fireCropGrowPost(level, pos.above(), this.defaultBlockState());
         }
         if (i == 2){
             level.setBlock(pos,state.setValue(IS_TEA,true),3);
@@ -136,27 +147,23 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
         return super.updateShape(p_57179_, p_57180_, p_57181_, p_57182_, p_57183_, p_57184_);
     }
 
-
-    public boolean canSurvive(BlockState p_57175_, LevelReader p_57176_, BlockPos p_57177_) {
-        BlockState soil = p_57176_.getBlockState(p_57177_.below());
-        if (soil.canSustainPlant(p_57176_, p_57177_.below(), Direction.UP, this)) return true;
-        BlockState blockstate = p_57176_.getBlockState(p_57177_.below());
-        if (blockstate.is(this)) {
+    private static boolean stemHasWater(BlockState state, LevelReader level, BlockPos pos) {
+        if (state.getValue(WATERLOGGED)) {
             return true;
-        } else {
-            if (blockstate.is(BlockTags.DIRT) || blockstate.is(BlockTags.SAND)) {
-                BlockPos blockpos = p_57177_.below();
-
-                for(Direction direction : Direction.Plane.HORIZONTAL) {
-                    BlockState blockstate1 = p_57176_.getBlockState(blockpos.relative(direction));
-                    FluidState fluidstate = p_57176_.getFluidState(blockpos.relative(direction));
-                    if (p_57175_.canBeHydrated(p_57176_, p_57177_, fluidstate, blockpos.relative(direction)) || blockstate1.is(Blocks.FROSTED_ICE)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
+        FluidState fluid = level.getFluidState(pos);
+        return !fluid.isEmpty() && fluid.is(FluidTags.WATER);
+    }
+
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        BlockState below = level.getBlockState(pos.below());
+        if (below.is(this)) {
+            return true;
+        }
+        if (below.is(BlockTags.DIRT) || below.is(BlockTags.SAND) || below.is(Blocks.GRAVEL)) {
+            return stemHasWater(state, level, pos);
+        }
+        return false;
     }
 
     @Override
@@ -164,7 +171,6 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
         boolean flag = context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER;
         return this.defaultBlockState().setValue(WATERLOGGED, flag);
     }
-
 
     public FluidState getFluidState(BlockState pState) {
         return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(pState);
@@ -176,12 +182,7 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
     }
 
     @Override
-    public BlockState getPlant(BlockGetter blockGetter, BlockPos blockPos) {
-        return defaultBlockState();
-    }
-
-    @Override
-    public boolean isValidBonemealTarget(LevelReader pLevel, BlockPos pPos, BlockState pState, boolean pIsClient) {
+    public boolean isValidBonemealTarget(LevelReader pLevel, BlockPos pPos, BlockState pState) {
         int i;
         for (i = 1; pLevel.getBlockState(pPos.below(i)).is(this); i++) {
 
@@ -196,7 +197,7 @@ public class LeisambooStalkBlock extends Block implements IPlantable,SimpleWater
 
     @Override
     public boolean isBonemealSuccess(Level level, RandomSource pRandom, BlockPos pos, BlockState pState) {
-        return isValidBonemealTarget(level,pos,pState,level.isClientSide);
+        return isValidBonemealTarget(level,pos,pState);
     }
 
     @Override

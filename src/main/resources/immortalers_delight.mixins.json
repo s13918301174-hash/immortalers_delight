@@ -2,12 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.renyigesai.immortalers_delight.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_21",
   "refmap": "immortalers_delight.refmap.json",
   "mixins": [
     "ItemEntityMixin",
     "PlayerMixin",
-    "SnifferMixin"
+    "SnifferMixin",
+    "JigsawStructureMixin"
   ],
   "client": [
   ],

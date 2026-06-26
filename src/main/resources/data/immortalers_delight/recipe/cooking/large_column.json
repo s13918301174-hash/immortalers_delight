@@ -1,0 +1,28 @@
+{
+  "type": "farmersdelight:cooking",
+  "ingredients": [
+    {
+      "tag": "forge:grain"
+    },
+    {
+      "item": "farmersdelight:tree_bark"
+    },
+    {
+      "item": "immortalers_delight:alfalfa"
+    },
+    {
+      "item": "immortalers_delight:alfalfa"
+    },
+    {
+      "item": "immortalers_delight:alfalfa"
+    },
+    {
+      "tag": "forge:wheat_ingredients"
+    }
+  ],
+  "result": {
+    "id": "immortalers_delight:large_column"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

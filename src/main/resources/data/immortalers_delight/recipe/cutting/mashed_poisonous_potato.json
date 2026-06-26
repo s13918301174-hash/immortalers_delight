@@ -1,0 +1,21 @@
+{
+  "type": "farmersdelight:cutting",
+  "ingredients": [
+    {
+      "item": "minecraft:poisonous_potato"
+    }
+  ],
+  "tool": [
+    {
+      "tag": "immortalers_delight:tools/immortal_hammers"
+    }
+  ],
+  "result": [
+    {
+      "item": {
+        "id": "immortalers_delight:mashed_poisonous_potato",
+        "count": 1
+      }
+    }
+  ]
+}

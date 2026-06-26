@@ -1,0 +1,25 @@
+{
+  "type": "farmersdelight:cooking",
+  "ingredients": [
+    {
+      "item": "immortalers_delight:evolutcorn_grains"
+    },
+    {
+      "item": "immortalers_delight:evolutcorn_grains"
+    },
+    {
+      "item": "immortalers_delight:evolutcorn_grains"
+    },
+    {
+      "tag": "forge:sugar"
+    }
+  ],
+  "container": {
+    "id": "minecraft:glass_bottle"
+  },
+  "result": {
+    "id": "immortalers_delight:evolutcorn_juice"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

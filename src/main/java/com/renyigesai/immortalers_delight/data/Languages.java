@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.renyigesai.immortalers_delight.ImmortalersDelightMod;
 import com.renyigesai.immortalers_delight.api.annotation.BlockData;
 import com.renyigesai.immortalers_delight.api.annotation.ItemData;
-import com.renyigesai.immortalers_delight.compat.init.Ltc2Items;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightBlocks;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightEntities;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightItems;
@@ -19,8 +18,8 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
@@ -78,7 +77,6 @@ public class Languages extends LanguageProvider {
             throw new RuntimeException(e);
         }
         addFluids();
-        addLatiao();
         addTooltips();
         addMessages();
         addContainers();
@@ -93,10 +91,12 @@ public class Languages extends LanguageProvider {
         for (Field field : _class.getDeclaredFields()) {
             if (field.isAnnotationPresent(ItemData.class)) {
                 Object object = field.get(null);
-                RegistryObject<Item> deferredItem = null;
-                if (object instanceof RegistryObject<?> registryObject) {
+                DeferredHolder<Item, Item> deferredItem = null;
+                if (object instanceof DeferredHolder<?, ?> registryObject) {
                     if (Item.class.isAssignableFrom(registryObject.get().getClass())){
-                        deferredItem = (RegistryObject<Item>) registryObject;
+                        @SuppressWarnings("unchecked")
+                        DeferredHolder<Item, Item> asItem = (DeferredHolder<Item, Item>) registryObject;
+                        deferredItem = asItem;
                     }
                 }
                 if (deferredItem != null) {
@@ -122,10 +122,12 @@ public class Languages extends LanguageProvider {
         for (Field field : _class.getDeclaredFields()) {
             if (field.isAnnotationPresent(BlockData.class)) {
                 Object object = field.get(null);
-                RegistryObject<Block> deferredBlock = null;
-                if (object instanceof RegistryObject<?> registryObject) {
+                DeferredHolder<Block, Block> deferredBlock = null;
+                if (object instanceof DeferredHolder<?, ?> registryObject) {
                     if (Block.class.isAssignableFrom(registryObject.get().getClass())){
-                        deferredBlock = (RegistryObject<Block>) registryObject;
+                        @SuppressWarnings("unchecked")
+                        DeferredHolder<Block, Block> asBlock = (DeferredHolder<Block, Block>) registryObject;
+                        deferredBlock = asBlock;
                     }
                 }
                 if (deferredBlock != null && hasBlockItem(deferredBlock.get())) {
@@ -153,40 +155,7 @@ public class Languages extends LanguageProvider {
     }
 
     private void addFluids(){
-        add("fluid_type.immortalers.delight.hot_spring","Grudge Spring","怨泉");
-    }
-
-    private void addLatiao(){
-        addItem(Ltc2Items.EVOLUTCORN_POWDER,"白垩玉黍粉");
-        addItem(Ltc2Items.EVOLUTCORN_LATIAO,"白垩玉黍辣条");
-        addItem(Ltc2Items.RARE_EVOLUTCORN_LATIAO,"白垩玉黍辣条");
-        addItem(Ltc2Items.SUPERIOR_EVOLUTCORN_LATIA,"白垩玉黍辣条");
-        addItem(Ltc2Items.DELICACY_EVOLUTCORN_LATIAO,"白垩玉黍辣条");
-        addItem(Ltc2Items.TREASURE_EVOLUTCORN_LATIAO,"白垩玉黍辣条");
-
-        addItem(Ltc2Items.KWAT_WHEAT_LATIAO,"瓦斯麦辣条");
-        addItem(Ltc2Items.RARE_KWAT_WHEAT_LATIAO,"瓦斯麦辣条");
-        addItem(Ltc2Items.SUPERIOR_KWAT_WHEAT_LATIAO,"瓦斯麦辣条");
-        addItem(Ltc2Items.DELICACY_KWAT_WHEAT_LATIAO,"瓦斯麦辣条");
-        addItem(Ltc2Items.TREASURE_KWAT_WHEAT_LATIAO,"瓦斯麦辣条");
-
-        addItem(Ltc2Items.MASHED_POISONOUS_POTATO_WITH_JAM_LATIAO,"果酱毒薯泥辣条");
-        addItem(Ltc2Items.RARE_MASHED_POISONOUS_POTATO_WITH_JAM_LATIAO,"果酱毒薯泥辣条");
-        addItem(Ltc2Items.SUPERIOR_MASHED_POISONOUS_POTATO_WITH_JAM_LATIAO,"果酱毒薯泥辣条");
-        addItem(Ltc2Items.DELICACY_MASHED_POISONOUS_POTATO_WITH_JAM_LATIAO,"果酱毒薯泥辣条");
-        addItem(Ltc2Items.TREASURE_MASHED_POISONOUS_POTATO_WITH_JAM_LATIAO,"果酱毒薯泥辣条");
-
-        addItem(Ltc2Items.IMMORTALERS_LATIAO_LUCKY_BAG,"千古辣条福袋");
-        addItem(Ltc2Items.HAKO_LATIAO,"「小盒子」的辣条");
-        addItem(Ltc2Items.WINDY_NARRATOR_LATIA,"「Windy Narrator」的辣条");
-        addItem(Ltc2Items.MOASWIES_LATIAO,"「Moaswies」的辣条");
-        addItem(Ltc2Items.RENYIGESAI_LATIAO,"「人一个噻」的辣条");
-        addItem(Ltc2Items.LYZ_DELIGHT_LATIAO,"「LYZ」的辣条");
-        addItem(Ltc2Items.XIAOSUHUAJI_LATIAO,"「小苏滑稽」的辣条");
-        addItem(Ltc2Items.TELLURIUM_LATIAO,"「Tellurium」的辣条");
-        addItem(Ltc2Items.KA_QKO_LATIAO,"「KaQko」的辣条");
-        addItem(Ltc2Items.BEI_DOU_LATIAO,"「北斗·神」的辣条");
-        addItem(Ltc2Items.DOUGER_LATIAO,"「多格」的辣条");
+        add("fluid_type.immortalers_delight.hot_spring","Grudge Spring","怨泉");
     }
 
     private void addTooltips(){
@@ -215,7 +184,9 @@ public class Languages extends LanguageProvider {
         createTooltip("cut_large_column","你需要用斧子劈开它","You need an axe to split it.");
         createTooltip("cut_pod_shell_burger_meat","你需要用刀切开它","You need a knife to cut it.");
         createTooltip("warped_laurel_seeds","可被种植在§f灵魂沙§r上，成熟时将周围的§f水转换为怨泉§r。","It can be planted on the §fsoul sand§r. When it matures, it will convert the surrounding §fwater into a grudge spring§r");
-        createTooltip("gelpitaya_seeds","可被种植在§f仙人掌§r上。","Can be planted on §fcacti§r.");
+        createTooltip("gelpitaya_seeds",
+                "可被种植在§f仙人掌§r上。§7于砧板：§f小刀§r切开果实得果肉；§f锤§r（手持式砂轮、砂轮方块等）加工果肉得种子。农夫乐事小刀可用。§r",
+                "Plant on §fcacti§r. §7Cutting board: §fknife§r → flesh; §fhammer§r (grindstone hammer/block) → seeds. Farmer's Delight knives work.§r");
         createTooltip("a_bush","可被种植在§f下界岩§r上，成长到最大阶段后放置§f岩浆§r可以被转换为§f烬烟木§r。","It can be planted on §fnetherrack§r and, when fully grown, placed on §flava§r, which can then be transformed into §fa bush log§r.");
         createTooltip("tooltip_item_name_block_item","§o按住Shift查看更多","§oPress Shift to view");
         createTooltip("sniffer_tail_regeneration","剪尾冷却：","Tail Regeneration");
@@ -373,7 +344,7 @@ public class Languages extends LanguageProvider {
         createAdvancement("eat_iced_black_tea",translateText("Essential for the exam","考试必备"),translateText("Drink Iced Black Tea.","喝下冰红茶。"));
         createAdvancement("eat_evolutcorn_hard_candy",translateText("Funny Character","搞笑角色"),translateText("Eat Evolutcorn Hard Candy and find that you are less vulnerable to damage while eating.","吃下玉黍硬糖。可以发现在吃糖的过程中更不易受到伤害。"));
         createAdvancement("eat_alfalfa_porridge",translateText("Long Term Vegetarian Diet","长期素食导致的"),translateText("Eat Alfalfa Porridge.","食用一碗苜蓿七草粥。"));
-        createAdvancement("crimson_clouds",translateText("Crimson Clouds","绯红烟云"),translateText("Unusual wheat seeds in Crimson Forest.","在绯红森林获得不同寻常的小麦种子。"));
+        createAdvancement("crimson_clouds",translateText("Crimson Clouds","绯红烟云"),translateText("Unusual wheat.json seeds in Crimson Forest.","在绯红森林获得不同寻常的小麦种子。"));
         createAdvancement("all_resistance_effects",translateText("Never Say Die","永不破防"),translateText("Get All Resistance Effect.","获得所有抵抗效果。"));
         createAdvancement("ealdaec_gemhus",translateText("Ealdæc Gemhūs","古炊凡家"),translateText("Get the ancient seeds from the plains.","千秋一粟，在平原获得酷似玉米粒的玉黎粒。"));
         createAdvancement("get_himekaido_trees",translateText("Spryt teon tō helpe hīe growan","拔苗助长"),translateText("Fertile land, extra fertilizers —— there is always a sacrifice to be made when pursuing excellence.","肥沃的土地、额外的肥料——追求卓越总要伴随牺牲。"));
@@ -397,6 +368,7 @@ public class Languages extends LanguageProvider {
         createAdvancement("resist_gas_poisoning",translateText("Wear a mask properly","戴好口罩"),translateText("Use golden fabric veil to resist gas poisoning.","利用绯炵金纱抵御瓦斯毒。"));
         createAdvancement("power_battle_mode",translateText("Activate power battle mode.","过去迟早会追上的"),translateText("Activate power battle mode.","开启超凡模式。"));
         createAdvancement("imm_boat_upgrade",translateText("Bigger! Better! Stronger!","更大！更好！更强！"),translateText("Build a large ship.","制造一搜大船。"));
+        createAdvancement("build_large_boat",translateText("Bigger! Better! Stronger!","更大！更好！更强！"),translateText("Build a large ship.","制造一艘大船。"));
         createAdvancement("get_sextlotus_seeds",translateText("Lunar soil tide","月壤潮汐"),translateText("Obtain Sextlotus Seeds in Forest.","在森林获得既望莲子。"));
         createAdvancement("get_moon_lantern",translateText("Pseudo Moonlight","赝作月华"),translateText("Use the Moonlight Phantom Lamp to accelerate the growth of Sextlotus.","使用幻月灯促进既望莲的生长。"));
     }
@@ -451,6 +423,13 @@ public class Languages extends LanguageProvider {
         add("creativetab_immortalers_delight_main_tab","Immortalers Delight Main","千古乐事 主物品");
         add("creativetab_immortalers_delight_decorative_blocks_tab","Immortalers Delight Decorative Blocks","千古乐事 装饰方块");
         add("config.jade.plugin_immortalers_delight.sniffer","Sniffer","嗅探兽");
+
+        add("item.minecraft.potion.effect.gas","Gas Potion","绯烬烈灼药水");
+        add("item.minecraft.splash_potion.effect.gas","Splash potion of Gas","喷溅型绯烬烈灼药水");
+        add("item.minecraft.lingering_potion.effect.gas","Lingering potion of Gas","滞留型绯烬烈灼药水");
+
+        add("tag.item.c.drinks.milk", "Milk", "牛奶");
+        add("tag.item.forge.milk", "Milk", "牛奶");
     }
 
     private void createDesc(String key,String en_us,String zh_cn){
@@ -484,6 +463,7 @@ public class Languages extends LanguageProvider {
 
     private void createFarmersdelightTooltip(String key,String en_us,String zh_cn){
         add(FARMERSDELIGHT_TOOLTIP + key,en_us,zh_cn);
+        add(FARMERSDELIGHT_TOOLTIP + ImmortalersDelightMod.MODID + ":" + key,en_us,zh_cn);
     }
     private void createMessage(String key,String en_us,String zh_cn){
         add(MESSAGE + key,en_us,zh_cn);

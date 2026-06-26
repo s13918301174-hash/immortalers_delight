@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "cooked_sniffer_steak": {
+      "conditions": {
+        "items": [
+          {
+            "items": "immortalers_delight:raw_sniffer_steak"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "immortalers_delight:cooked_sniffer_steak_from_campfire_cooking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "cooked_sniffer_steak"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "immortalers_delight:cooked_sniffer_steak_from_campfire_cooking"
+    ]
+  }
+}

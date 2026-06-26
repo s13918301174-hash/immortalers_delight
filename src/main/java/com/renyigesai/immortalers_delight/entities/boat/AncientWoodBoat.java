@@ -4,6 +4,7 @@ import com.renyigesai.immortalers_delight.Config;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightEntities;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightItems;
 import com.renyigesai.immortalers_delight.init.ImmortalersDelightTags;
+import com.renyigesai.immortalers_delight.entities.living.illager_archaeological_team.PercussionProber;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -41,12 +42,10 @@ public class AncientWoodBoat extends ImmortalersBoat {
         this.yo = pY;
         this.zo = pZ;
     }
-    @Override
     public void destroy(DamageSource damageSource) {
         this.spawnAtLocation(new ItemStack(ImmortalersDelightItems.ANCIENT_WOOD_LOG.get(),5));
     }
 
-    @Override
     public double getPassengersRidingOffset() {
         return 0.25D;
     }
@@ -83,6 +82,19 @@ public class AncientWoodBoat extends ImmortalersBoat {
 
     public static boolean isAnimalEsque(Entity passenger) {
         return passenger instanceof Animal || passenger instanceof HoglinBase || (passengerSize(passenger) > 1 && passenger instanceof Spider);
+    }
+
+    /**
+     * 1.21 用 {@code vehicleAttachment} 替代已移除的 {@code getMyRidingOffset()}。
+     * 站姿生物（村民等）attachment Y≈0；坐姿（玩家、猪灵、僵尸等）Y 明显偏高，需减 1 格对齐船面。
+     */
+    static float getAncientBoatPassengerYOffset(Entity passenger, Entity vehicle) {
+        float attachY = (float) passenger.getVehicleAttachmentPoint(vehicle).y;
+        float correction = attachY < 0.05F ? attachY : attachY - 1.0F;
+        if (passenger instanceof PercussionProber) {
+            return 0.4F + correction;
+        }
+        return correction;
     }
 
     @Override
@@ -184,7 +196,8 @@ public class AncientWoodBoat extends ImmortalersBoat {
                 }
             }
 
-            float f1 = (float) ((this.isRemoved() ? (double) 0.01F : this.getPassengersRidingOffset()) + passenger.getMyRidingOffset());
+            float f1 = (float) (this.isRemoved() ? 0.01F : this.getPassengersRidingOffset())
+                    + getAncientBoatPassengerYOffset(passenger, this);
             Vec3 vector3d = (new Vec3(x, 0.0D, z)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
             function.accept(passenger, this.getX() + vector3d.x, this.getY() + (double) f1, this.getZ() + vector3d.z);
             passenger.setYRot(passenger.getYRot() + this.deltaRotation);

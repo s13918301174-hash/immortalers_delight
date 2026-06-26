@@ -1,0 +1,34 @@
+{
+  "type": "farmersdelight:cutting",
+  "ingredients": [
+    {
+      "item": "immortalers_delight:raw_sniffer_tail"
+    }
+  ],
+  "result": [
+    {
+      "item": {
+        "id": "immortalers_delight:raw_sniffer_steak",
+        "count": 2
+      }
+    },
+    {
+      "item": {
+        "id": "minecraft:bone",
+        "count": 1
+      }
+    }
+  ],
+  "tool": [
+    {
+      "type": "farmersdelight:item_ability",
+      "action": "knife_dig"
+    },
+    {
+      "tag": "c:tools/knife"
+    },
+    {
+      "tag": "immortalers_delight:tools/immortal_knives"
+    }
+  ]
+}
