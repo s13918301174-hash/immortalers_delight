@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:carrot",
+    "minecraft:beetroot",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:red_mushroom",
+    "minecraft:brown_mushroom",
+    {
+      "id": "farmersdelight:cabbage",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cabbage_leaf",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:tomato",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:onion",
+      "required": false
+    },
+    "#forge:salad_ingredients"
+  ]
+}

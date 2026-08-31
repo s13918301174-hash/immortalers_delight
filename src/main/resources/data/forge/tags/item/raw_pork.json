@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "minecraft:porkchop"
+    "minecraft:porkchop",
+    {
+      "id": "farmersdelight:bacon",
+      "required": false
+    }
   ]
 }

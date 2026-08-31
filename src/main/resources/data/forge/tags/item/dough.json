@@ -1,7 +1,10 @@
 {
   "replace": false,
   "values": [
-    "#c:foods/dough",
-    "farmersdelight:wheat_dough"
+    {
+      "id": "farmersdelight:wheat_dough",
+      "required": false
+    },
+    "immortalers_delight:kwat_wheat_dough"
   ]
 }

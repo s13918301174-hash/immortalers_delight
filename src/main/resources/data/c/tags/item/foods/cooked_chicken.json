@@ -1,6 +1,11 @@
 {
+  "replace": false,
   "values": [
     "minecraft:cooked_chicken",
+    {
+      "id": "farmersdelight:cooked_chicken_cuts",
+      "required": false
+    },
     "#forge:cooked_chicken"
   ]
 }

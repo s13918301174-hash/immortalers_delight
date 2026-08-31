@@ -1,16 +1,25 @@
 {
   "replace": false,
   "values": [
-    "#c:crops/tomato",
-    "#c:foods/tomato",
-    "#c:foods/vegetable",
-    "#c:foods/vegetables",
     "minecraft:carrot",
     "minecraft:potato",
     "minecraft:beetroot",
     "minecraft:sweet_berries",
-    "farmersdelight:cabbage",
-    "farmersdelight:tomato",
-    "farmersdelight:onion"
+    {
+      "id": "farmersdelight:cabbage",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cabbage_leaf",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:tomato",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:onion",
+      "required": false
+    }
   ]
 }

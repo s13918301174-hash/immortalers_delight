@@ -6,7 +6,7 @@
       "item": "minecraft:bone"
     },
     "s": {
-      "tag": "forge:leather"
+      "tag": "c:leathers"
     }
   },
   "pattern": [

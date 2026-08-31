@@ -8,7 +8,7 @@
       "tag": "minecraft:soul_fire_base_blocks"
     },
     {
-      "tag": "forge:enchanting_fuels"
+      "tag": "c:enchanting_fuels"
     }
   ],
   "output": {

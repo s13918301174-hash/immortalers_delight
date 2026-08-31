@@ -1,7 +1,28 @@
 {
+  "replace": false,
   "values": [
+    {
+      "id": "farmersdelight:flint_knife",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:iron_knife",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:diamond_knife",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:netherite_knife",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:golden_knife",
+      "required": false
+    },
+    "immortalers_delight:bone_knife",
     "#immortalers_delight:tools/immortal_knives",
-    "immortalers_delight:rusty_ancient_blade",
-    "immortalers_delight:ancient_blade"
+    "#forge:tools/knives"
   ]
 }

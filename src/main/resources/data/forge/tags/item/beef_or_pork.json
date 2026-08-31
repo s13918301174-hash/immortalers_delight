@@ -1,6 +1,15 @@
 {
   "replace": false,
   "values": [
-    "#immortalers_delight:beef_or_pork"
+    "minecraft:beef",
+    "minecraft:porkchop",
+    {
+      "id": "farmersdelight:minced_beef",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:bacon",
+      "required": false
+    }
   ]
 }

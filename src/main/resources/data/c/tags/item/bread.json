@@ -1,15 +1,8 @@
 {
+  "replace": false,
   "values": [
     "minecraft:bread",
-    {
-      "id": "farmersdelight:wheat_dough",
-      "required": false
-    },
-    {
-      "id": "farmersdelight:raw_pasta",
-      "required": false
-    },
-    "immortalers_delight:kwat_wheat_toast",
-    "immortalers_delight:evolutcorn_bread"
+    "#forge:bread",
+    "#forge:bread_slices"
   ]
 }

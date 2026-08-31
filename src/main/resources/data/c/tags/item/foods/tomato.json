@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     {
       "id": "farmersdelight:tomato",
@@ -7,6 +8,8 @@
     {
       "id": "farmersdelight:rotten_tomato",
       "required": false
-    }
+    },
+    "#forge:vegetables/tomato",
+    "#forge:crops/tomato"
   ]
 }

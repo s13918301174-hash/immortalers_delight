@@ -1,6 +1,13 @@
 {
+  "replace": false,
   "values": [
     "minecraft:cooked_beef",
+    {
+      "id": "farmersdelight:beef_patty",
+      "required": false
+    },
+    "immortalers_delight:cooked_sniffer_steak",
+    "immortalers_delight:cooked_sniffer_slice",
     "#forge:cooked_beef"
   ]
 }

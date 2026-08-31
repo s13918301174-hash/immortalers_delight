@@ -1,6 +1,12 @@
 {
+  "replace": false,
   "values": [
     "minecraft:chicken",
-    "#forge:raw_chicken"
+    {
+      "id": "farmersdelight:chicken_cuts",
+      "required": false
+    },
+    "#forge:raw_chicken",
+    "#forge:rawchicken"
   ]
 }

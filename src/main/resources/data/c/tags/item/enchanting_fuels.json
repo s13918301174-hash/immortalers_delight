@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:lapis_lazuli",
+    "minecraft:experience_bottle",
+    "#forge:enchanting_fuels"
+  ]
+}

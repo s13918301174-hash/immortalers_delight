@@ -1,5 +1,11 @@
 {
+  "replace": false,
   "values": [
-    "immortalers_delight:fried_sniffer_egg"
+    {
+      "id": "farmersdelight:fried_egg",
+      "required": false
+    },
+    "immortalers_delight:fried_sniffer_egg",
+    "#forge:cooked_eggs"
   ]
 }
