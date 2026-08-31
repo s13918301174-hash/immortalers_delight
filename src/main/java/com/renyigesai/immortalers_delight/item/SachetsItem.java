@@ -3,7 +3,6 @@ package com.renyigesai.immortalers_delight.item;
 import com.renyigesai.immortalers_delight.event.SnifferEvent;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -18,11 +17,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.sniffer.Sniffer;
-import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +36,20 @@ public class SachetsItem extends EnchantAbleFoodItem{
     }
 
     @Override
+    public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, @NotNull LivingEntity consumer) {
+        return stack;
+    }
+
+    @Override
     public void releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pEntityLiving, int pTimeLeft) {
-        super.releaseUsing(pStack, pLevel, pEntityLiving, pTimeLeft);
         if (pEntityLiving instanceof Player player) {
             if (pLevel instanceof ServerLevel serverLevel && !serverLevel.isClientSide) {
-                if (pTimeLeft >= 6) {
+                int usedTicks = this.getUseDuration(pStack, pEntityLiving) - pTimeLeft;
+                if (usedTicks >= 6) {
                     int itemDamage = 0;
                     List<LivingEntity> entities = serverLevel.getEntitiesOfClass(
                             LivingEntity.class,
-                            player.getBoundingBox().inflate(Math.min(pTimeLeft, 16))
+                            player.getBoundingBox().inflate(16)
                     );
                     boolean adv = false;
                     for (LivingEntity entity : entities) {
@@ -89,17 +91,12 @@ public class SachetsItem extends EnchantAbleFoodItem{
         }
     }
 
-    /**
-     * How long it takes to use or consume an item
-     */
-    public int getUseDuration(ItemStack pStack) {
+    @Override
+    public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
         return 72000;
     }
 
-    /**
-     * Returns the action that specifies what animation to play when the item is being used.
-     */
-    public UseAnim getUseAnimation(ItemStack pStack) {
+    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack stack) {
         return UseAnim.BRUSH;
     }
 

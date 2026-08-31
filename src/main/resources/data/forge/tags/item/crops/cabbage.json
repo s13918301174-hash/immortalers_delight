@@ -1,7 +1,13 @@
 {
   "replace": false,
   "values": [
-    "farmersdelight:cabbage",
-    "farmersdelight:cabbage_leaf"
+    {
+      "id": "farmersdelight:cabbage",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cabbage_leaf",
+      "required": false
+    }
   ]
 }

@@ -11,10 +11,10 @@
       "item": "minecraft:porkchop"
     },
     {
-      "tag": "forge:vegetables"
+      "tag": "c:foods/vegetable"
     },
     {
-      "tag": "forge:vegetables"
+      "tag": "c:foods/vegetable"
     }
   ],
   "result": {

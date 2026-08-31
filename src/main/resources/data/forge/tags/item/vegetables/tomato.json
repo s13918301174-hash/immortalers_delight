@@ -1,6 +1,13 @@
 {
   "replace": false,
   "values": [
-    "#c:crops/tomato"
+    {
+      "id": "farmersdelight:tomato",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:rotten_tomato",
+      "required": false
+    }
   ]
 }

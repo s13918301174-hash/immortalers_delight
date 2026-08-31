@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:mutton",
+    {
+      "id": "farmersdelight:mutton_chops",
+      "required": false
+    },
+    "#forge:raw_mutton"
+  ]
+}

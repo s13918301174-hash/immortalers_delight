@@ -1,6 +1,32 @@
 {
+  "replace": false,
   "values": [
+    "minecraft:cooked_beef",
+    "minecraft:cooked_porkchop",
+    "minecraft:cooked_chicken",
+    "minecraft:cooked_mutton",
+    "minecraft:cooked_rabbit",
+    {
+      "id": "farmersdelight:beef_patty",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cooked_chicken_cuts",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cooked_bacon",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:cooked_mutton_chops",
+      "required": false
+    },
     "immortalers_delight:cooked_sniffer_steak",
-    "immortalers_delight:cooked_sniffer_slice"
+    "immortalers_delight:cooked_sniffer_slice",
+    "#forge:cooked_meat",
+    "#forge:cooked_meats",
+    "#forge:cookedmeat",
+    "#forge:cookedmeats"
   ]
 }

@@ -12,7 +12,7 @@
       "item": "farmersdelight:tomato_sauce"
     },
     {
-      "item": "c:foods/onion"
+      "tag": "c:foods/onion"
     },
     {
       "item": "minecraft:torchflower"

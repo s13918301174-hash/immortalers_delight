@@ -2,7 +2,7 @@
   "type": "farmersdelight:cooking",
   "ingredients": [
     {
-      "tag": "forge:grain"
+      "tag": "c:grain"
     },
     {
       "item": "farmersdelight:tree_bark"
@@ -17,7 +17,7 @@
       "item": "immortalers_delight:alfalfa"
     },
     {
-      "tag": "immortalers_delight:wheat_ingredients"
+      "tag": "c:wheat_ingredients"
     }
   ],
   "result": {

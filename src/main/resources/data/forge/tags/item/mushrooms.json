@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#c:foods/mushroom"
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom"
   ]
 }

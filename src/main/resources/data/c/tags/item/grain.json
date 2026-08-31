@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wheat",
+    {
+      "id": "farmersdelight:rice",
+      "required": false
+    },
+    "immortalers_delight:evolutcorn",
+    "immortalers_delight:evolutcorn_grains",
+    "immortalers_delight:kwat_wheat",
+    "immortalers_delight:alfalfa",
+    "#forge:grain"
+  ]
+}

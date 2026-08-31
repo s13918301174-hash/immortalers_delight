@@ -1,6 +1,13 @@
 {
   "replace": false,
   "values": [
-    "#c:crops/rice"
+    {
+      "id": "farmersdelight:rice",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:rice_panicle",
+      "required": false
+    }
   ]
 }

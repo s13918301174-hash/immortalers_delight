@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:beef",
+    {
+      "id": "farmersdelight:minced_beef",
+      "required": false
+    },
+    "immortalers_delight:raw_sniffer_steak",
+    "immortalers_delight:raw_sniffer_slice",
+    "#forge:raw_beef"
+  ]
+}
