@@ -72,6 +72,12 @@ def fix_obj(obj: object, path: pathlib.Path) -> tuple[bool, object]:
                 elif isinstance(ing, dict) and ing.get("item") == "minecraft:grass":
                     new_ings.append({"item": "minecraft:short_grass"})
                     changed = True
+                elif isinstance(ing, dict) and isinstance(ing.get("item"), str) and ing["item"].startswith("c:"):
+                    new_ings.append({"tag": ing["item"]})
+                    changed = True
+                elif isinstance(ing, dict) and isinstance(ing.get("item"), str) and ing["item"].startswith("forge:"):
+                    new_ings.append({"tag": ing["item"]})
+                    changed = True
                 else:
                     new_ings.append(ing)
             obj["ingredients"] = new_ings
