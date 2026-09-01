@@ -6,6 +6,9 @@
       "required": false
     },
     "immortalers_delight:kwat_wheat_dough",
-    "#forge:dough"
+    {
+      "id": "#forge:dough",
+      "required": false
+    }
   ]
 }

@@ -9,7 +9,13 @@
       "id": "farmersdelight:rotten_tomato",
       "required": false
     },
-    "#forge:vegetables/tomato",
-    "#forge:crops/tomato"
+    {
+      "id": "#forge:vegetables/tomato",
+      "required": false
+    },
+    {
+      "id": "#forge:crops/tomato",
+      "required": false
+    }
   ]
 }

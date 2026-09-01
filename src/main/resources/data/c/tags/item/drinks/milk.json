@@ -6,6 +6,9 @@
       "id": "farmersdelight:milk_bottle",
       "required": false
     },
-    "#forge:milk"
+    {
+      "id": "#forge:milk",
+      "required": false
+    }
   ]
 }

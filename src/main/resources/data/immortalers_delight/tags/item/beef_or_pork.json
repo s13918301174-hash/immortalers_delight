@@ -3,7 +3,13 @@
   "values": [
     "#c:foods/raw_beef",
     "#c:foods/raw_pork",
-    "#forge:raw_beef",
-    "#forge:raw_pork"
+    {
+      "id": "#forge:raw_beef",
+      "required": false
+    },
+    {
+      "id": "#forge:raw_pork",
+      "required": false
+    }
   ]
 }

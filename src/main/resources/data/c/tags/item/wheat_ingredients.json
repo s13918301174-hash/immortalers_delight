@@ -3,8 +3,17 @@
   "values": [
     "minecraft:wheat",
     "minecraft:wheat_seeds",
-    "#forge:wheat_ingredients",
-    "#forge:crops/wheat",
-    "#forge:seeds/wheat"
+    {
+      "id": "#forge:wheat_ingredients",
+      "required": false
+    },
+    {
+      "id": "#forge:crops/wheat",
+      "required": false
+    },
+    {
+      "id": "#forge:seeds/wheat",
+      "required": false
+    }
   ]
 }

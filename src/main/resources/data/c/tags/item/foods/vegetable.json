@@ -21,6 +21,9 @@
       "id": "farmersdelight:onion",
       "required": false
     },
-    "#forge:vegetables"
+    {
+      "id": "#forge:vegetables",
+      "required": false
+    }
   ]
 }

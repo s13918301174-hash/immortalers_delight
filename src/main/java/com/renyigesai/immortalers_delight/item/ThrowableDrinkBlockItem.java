@@ -31,7 +31,8 @@ public class ThrowableDrinkBlockItem extends DrinkItem{
         pPlayer.startUsingItem(pHand);
         return InteractionResultHolder.consume(itemstack);
     }
-    public int getUseDuration(ItemStack pStack) {
+    @Override
+    public int getUseDuration(ItemStack pStack, LivingEntity entity) {
         return 72000;
     }
 
@@ -39,7 +40,7 @@ public class ThrowableDrinkBlockItem extends DrinkItem{
         return UseAnim.BOW;
     }
     public void releaseUsing(ItemStack itemstack, Level pLevel, LivingEntity pEntityLiving, int pTimeLeft) {
-        int i = this.getUseDuration(itemstack) - pTimeLeft;
+        int i = this.getUseDuration(itemstack, pEntityLiving) - pTimeLeft;
         if (i < 0) return;
         float f = getPowerForTime(i);
         if (f > 0.9f) {

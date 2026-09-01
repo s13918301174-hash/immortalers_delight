@@ -24,24 +24,13 @@
     },
     "immortalers_delight:raw_sniffer_steak",
     "immortalers_delight:raw_sniffer_slice",
-    {
-      "id": "#forge:raw_meat",
-      "required": false
-    },
+    "#c:foods/raw_meat",
     {
       "id": "#forge:raw_meats",
       "required": false
     },
     {
-      "id": "#forge:rawmeat",
-      "required": false
-    },
-    {
-      "id": "#forge:rawmeats",
-      "required": false
-    },
-    {
-      "id": "#forge:common_raw_meats",
+      "id": "#forge:raw_meat",
       "required": false
     }
   ]

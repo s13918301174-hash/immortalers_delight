@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:sugar",
-    "#forge:sugar"
+    {
+      "id": "#forge:sugar",
+      "required": false
+    }
   ]
 }

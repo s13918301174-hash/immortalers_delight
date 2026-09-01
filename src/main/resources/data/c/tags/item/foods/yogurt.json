@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "immortalers_delight:yogurt",
-    "#forge:yogurt"
+    {
+      "id": "#forge:yogurt",
+      "required": false
+    }
   ]
 }

@@ -9,6 +9,9 @@
       "id": "farmersdelight:cabbage_leaf",
       "required": false
     },
-    "#forge:crops/cabbage"
+    {
+      "id": "#forge:crops/cabbage",
+      "required": false
+    }
   ]
 }

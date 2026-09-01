@@ -8,6 +8,9 @@
     },
     "immortalers_delight:raw_sniffer_steak",
     "immortalers_delight:raw_sniffer_slice",
-    "#forge:raw_beef"
+    {
+      "id": "#forge:raw_beef",
+      "required": false
+    }
   ]
 }

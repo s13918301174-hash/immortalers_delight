@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:blaze_rod",
-    "#forge:rods/blaze"
+    {
+      "id": "#forge:rods/blaze",
+      "required": false
+    }
   ]
 }

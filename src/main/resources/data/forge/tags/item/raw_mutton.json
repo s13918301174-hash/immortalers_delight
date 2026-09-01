@@ -1,10 +1,9 @@
 {
   "replace": false,
   "values": [
-    "minecraft:stick",
-    "minecraft:bamboo",
+    "minecraft:mutton",
     {
-      "id": "#forge:rods/wooden",
+      "id": "farmersdelight:mutton_chops",
       "required": false
     }
   ]

@@ -23,6 +23,9 @@
     },
     "immortalers_delight:bone_knife",
     "#immortalers_delight:tools/immortal_knives",
-    "#forge:tools/knives"
+    {
+      "id": "#forge:tools/knives",
+      "required": false
+    }
   ]
 }
