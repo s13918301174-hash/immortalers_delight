@@ -2,7 +2,10 @@
 """
 Immortalers Delight 1.21.1 tag policy:
   - Recipes prefer c: convention tags
-  - c: tags list concrete items first, then #forge:... as fallback
+  - c: tags list concrete items first, then OPTIONAL #forge:... fallbacks
+    (required:false). A missing #forge: must NEVER fail the whole merged c: tag —
+    that empties NeoForge/FD contributions pack-wide (Empty Tag in JEI).
+  - Do NOT redefine NeoForge-owned tags we don't extend (e.g. c:stones).
   - forge: tags stay concrete-only (no #c: nesting) to avoid cycles
   - Mod-specific tool tags stay immortalers_delight:
 """
@@ -117,16 +120,6 @@ MILK = ["minecraft:milk_bucket", opt("farmersdelight:milk_bottle")]
 SUGAR = ["minecraft:sugar"]
 BREAD = ["minecraft:bread", opt("farmersdelight:wheat_dough")]  # keep bread-ish
 MUSHROOM = ["minecraft:brown_mushroom", "minecraft:red_mushroom"]
-STONES = [
-    "minecraft:stone",
-    "minecraft:cobblestone",
-    "minecraft:deepslate",
-    "minecraft:cobbled_deepslate",
-    "minecraft:andesite",
-    "minecraft:diorite",
-    "minecraft:granite",
-    "minecraft:tuff",
-]
 KNIFE = [
     opt("farmersdelight:flint_knife"),
     opt("farmersdelight:iron_knife"),
@@ -146,14 +139,15 @@ RICE = [opt("farmersdelight:rice"), opt("farmersdelight:rice_panicle")]
 
 
 def with_forge_fallback(concrete: list, *forge_tags: str) -> list:
+    """Append forge tag refs as optional so missing forge: never empties c:."""
     out = list(concrete)
     for tag in forge_tags:
-        out.append(f"#{tag}")
+        out.append(opt(f"#{tag}"))
     return out
 
 
 def write_all_tags() -> None:
-    # --- c: primary (concrete first, forge fallback) ---
+    # --- c: primary (concrete first, optional forge fallback) ---
     write_tag(ROOT / "c/tags/item/salad_ingredients.json", with_forge_fallback(SALAD, "forge:salad_ingredients"))
     write_tag(ROOT / "c/tags/item/foods/vegetable.json", with_forge_fallback(VEGETABLES, "forge:vegetables"))
     write_tag(ROOT / "c/tags/item/foods/vegetables.json", with_forge_fallback(VEGETABLES, "forge:vegetables"))
@@ -174,6 +168,11 @@ def write_all_tags() -> None:
             "forge:rawmeats",
             "forge:common_raw_meats",
         ),
+    )
+    # Legacy flat name some packs still use (NeoForge/FD use c:foods/raw_meat)
+    write_tag(
+        ROOT / "c/tags/item/raw_meats.json",
+        with_forge_fallback(RAW_MEAT + ["#c:foods/raw_meat"], "forge:raw_meats", "forge:raw_meat"),
     )
     write_tag(ROOT / "c/tags/item/foods/cooked_beef.json", with_forge_fallback(COOKED_BEEF, "forge:cooked_beef"))
     write_tag(
@@ -204,7 +203,12 @@ def write_all_tags() -> None:
     write_tag(ROOT / "c/tags/item/drinks/milk.json", with_forge_fallback(MILK, "forge:milk"))
     write_tag(ROOT / "c/tags/item/sugar.json", with_forge_fallback(SUGAR, "forge:sugar"))
     write_tag(ROOT / "c/tags/item/bread.json", with_forge_fallback(["minecraft:bread"], "forge:bread", "forge:bread_slices"))
-    write_tag(ROOT / "c/tags/item/stones.json", with_forge_fallback(STONES, "forge:stone", "forge:cobblestone"))
+    # Do NOT write c:stones — NeoForge already owns it; a required missing #forge:stone
+    # wiped the merged tag for the whole pack (repeater etc.).
+    stones_path = ROOT / "c/tags/item/stones.json"
+    if stones_path.exists():
+        stones_path.unlink()
+        print(f"removed {stones_path.relative_to(ROOT)} (leave to NeoForge)")
     write_tag(
         ROOT / "c/tags/item/tools/knife.json",
         with_forge_fallback(KNIFE, "forge:tools/knives"),
@@ -235,6 +239,7 @@ def write_all_tags() -> None:
     write_tag(ROOT / "forge/tags/item/raw_chicken.json", RAW_CHICKEN)
     write_tag(ROOT / "forge/tags/item/rawchicken.json", RAW_CHICKEN)
     write_tag(ROOT / "forge/tags/item/raw_pork.json", RAW_PORK)
+    write_tag(ROOT / "forge/tags/item/raw_mutton.json", RAW_MUTTON)
     write_tag(ROOT / "forge/tags/item/raw_meat.json", RAW_MEAT)
     write_tag(ROOT / "forge/tags/item/raw_meats.json", RAW_MEAT)
     write_tag(ROOT / "forge/tags/item/rawmeat.json", RAW_MEAT)
@@ -268,13 +273,13 @@ def write_all_tags() -> None:
     write_tag(ROOT / "forge/tags/item/wheat_ingredients.json", ["minecraft:wheat", "minecraft:wheat_seeds"])
     write_tag(ROOT / "forge/tags/item/beef_or_pork.json", ["minecraft:beef", "minecraft:porkchop", opt("farmersdelight:minced_beef"), opt("farmersdelight:bacon")])
 
-    # immortalers aliases → c (thin)
+    # immortalers aliases → c (thin); forge refs optional
     write_tag(ROOT / "immortalers_delight/tags/item/salad_ingredients.json", ["#c:salad_ingredients"])
     write_tag(ROOT / "immortalers_delight/tags/item/vegetables.json", ["#c:foods/vegetable", "#c:foods/vegetables"])
     write_tag(ROOT / "immortalers_delight/tags/item/common_raw_meats.json", ["#c:foods/raw_meat"])
     write_tag(
         ROOT / "immortalers_delight/tags/item/beef_or_pork.json",
-        ["#c:foods/raw_beef", "#c:foods/raw_pork", "#forge:raw_beef", "#forge:raw_pork"],
+        ["#c:foods/raw_beef", "#c:foods/raw_pork", opt("#forge:raw_beef"), opt("#forge:raw_pork")],
     )
     write_tag(ROOT / "immortalers_delight/tags/item/wheat_ingredients.json", ["#c:wheat_ingredients"])
 

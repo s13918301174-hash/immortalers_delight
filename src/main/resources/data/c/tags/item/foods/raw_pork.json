@@ -6,6 +6,9 @@
       "id": "farmersdelight:bacon",
       "required": false
     },
-    "#forge:raw_pork"
+    {
+      "id": "#forge:raw_pork",
+      "required": false
+    }
   ]
 }

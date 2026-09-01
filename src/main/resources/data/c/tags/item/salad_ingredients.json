@@ -23,6 +23,9 @@
       "id": "farmersdelight:onion",
       "required": false
     },
-    "#forge:salad_ingredients"
+    {
+      "id": "#forge:salad_ingredients",
+      "required": false
+    }
   ]
 }

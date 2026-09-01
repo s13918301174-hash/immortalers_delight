@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:egg",
-    "#forge:eggs"
+    {
+      "id": "#forge:eggs",
+      "required": false
+    }
   ]
 }

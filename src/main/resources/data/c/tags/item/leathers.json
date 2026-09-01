@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:leather",
-    "#forge:leather"
+    {
+      "id": "#forge:leather",
+      "required": false
+    }
   ]
 }

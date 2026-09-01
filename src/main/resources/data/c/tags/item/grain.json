@@ -10,6 +10,9 @@
     "immortalers_delight:evolutcorn_grains",
     "immortalers_delight:kwat_wheat",
     "immortalers_delight:alfalfa",
-    "#forge:grain"
+    {
+      "id": "#forge:grain",
+      "required": false
+    }
   ]
 }

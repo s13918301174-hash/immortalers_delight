@@ -3,6 +3,9 @@
   "values": [
     "minecraft:lapis_lazuli",
     "minecraft:experience_bottle",
-    "#forge:enchanting_fuels"
+    {
+      "id": "#forge:enchanting_fuels",
+      "required": false
+    }
   ]
 }

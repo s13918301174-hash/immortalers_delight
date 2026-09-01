@@ -6,6 +6,9 @@
       "id": "farmersdelight:cooked_chicken_cuts",
       "required": false
     },
-    "#forge:cooked_chicken"
+    {
+      "id": "#forge:cooked_chicken",
+      "required": false
+    }
   ]
 }

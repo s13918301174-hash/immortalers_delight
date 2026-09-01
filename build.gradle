@@ -70,9 +70,15 @@ sourceSets.main.resources {
     srcDir('src/generated/resources')
 }
 
+if (project.hasProperty('skipEmi')) {
+    sourceSets.main.java.exclude 'com/renyigesai/immortalers_delight/integration/emi/**'
+}
+
 dependencies {
-    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-    localRuntime "dev.emi:emi-neoforge:${emi_version}"
+    if (!project.hasProperty('skipEmi')) {
+        compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+        localRuntime "dev.emi:emi-neoforge:${emi_version}"
+    }
 
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"

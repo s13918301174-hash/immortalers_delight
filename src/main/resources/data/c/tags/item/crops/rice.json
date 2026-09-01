@@ -9,7 +9,13 @@
       "id": "farmersdelight:rice_panicle",
       "required": false
     },
-    "#forge:crops/rice",
-    "#forge:seeds/rice"
+    {
+      "id": "#forge:crops/rice",
+      "required": false
+    },
+    {
+      "id": "#forge:seeds/rice",
+      "required": false
+    }
   ]
 }

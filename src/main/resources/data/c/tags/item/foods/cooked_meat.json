@@ -24,9 +24,21 @@
     },
     "immortalers_delight:cooked_sniffer_steak",
     "immortalers_delight:cooked_sniffer_slice",
-    "#forge:cooked_meat",
-    "#forge:cooked_meats",
-    "#forge:cookedmeat",
-    "#forge:cookedmeats"
+    {
+      "id": "#forge:cooked_meat",
+      "required": false
+    },
+    {
+      "id": "#forge:cooked_meats",
+      "required": false
+    },
+    {
+      "id": "#forge:cookedmeat",
+      "required": false
+    },
+    {
+      "id": "#forge:cookedmeats",
+      "required": false
+    }
   ]
 }

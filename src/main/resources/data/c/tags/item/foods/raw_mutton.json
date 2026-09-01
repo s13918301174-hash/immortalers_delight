@@ -6,6 +6,9 @@
       "id": "farmersdelight:mutton_chops",
       "required": false
     },
-    "#forge:raw_mutton"
+    {
+      "id": "#forge:raw_mutton",
+      "required": false
+    }
   ]
 }

@@ -8,6 +8,9 @@
     },
     "immortalers_delight:cooked_sniffer_steak",
     "immortalers_delight:cooked_sniffer_slice",
-    "#forge:cooked_beef"
+    {
+      "id": "#forge:cooked_beef",
+      "required": false
+    }
   ]
 }
